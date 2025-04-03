@@ -3,35 +3,25 @@ import SwiftUI
 // Color theme that adapts to light/dark mode
 struct AppTheme {
     // Main colors
-    static let primary = Color("PrimaryColor")
-    static let secondary = Color("SecondaryColor")
-    static let accent = Color("AccentColor")
-    static let background = Color("BackgroundColor")
-    static let cardBackground = Color("CardBackgroundColor")
+    static let primary = Color.blue
+    static let secondary = Color.gray
+    static let accent = Color.orange
+    static let background = Color(.systemBackground)
+    static let cardBackground = Color(.secondarySystemBackground)
     
     // Text colors
-    static let primaryText = Color("PrimaryTextColor")
-    static let secondaryText = Color("SecondaryTextColor")
+    static let primaryText = Color(.label)
+    static let secondaryText = Color(.secondaryLabel)
     
     // Mood colors
     static func moodColor(_ mood: Mood) -> Color {
         switch mood {
-        case .happy: return Color("HappyColor")
-        case .sad: return Color("SadColor")
-        case .energetic: return Color("EnergeticColor")
-        case .tired: return Color("TiredColor")
-        case .stressed: return Color("StressedColor")
+        case .happy: return Color.green
+        case .sad: return Color.blue
+        case .energetic: return Color.orange
+        case .tired: return Color.gray
+        case .stressed: return Color.red
         }
-    }
-}
-
-// Card shapes with custom styling
-struct RecipeCardShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let cornerRadius: CGFloat = 20
-        path.addRoundedRect(in: rect, cornerSize: CGSize(width: cornerRadius, height: cornerRadius))
-        return path
     }
 }
 
@@ -40,7 +30,7 @@ extension View {
     func cardStyle() -> some View {
         self
             .background(AppTheme.cardBackground)
-            .clipShape(RecipeCardShape())
+            .cornerRadius(15)
             .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
@@ -50,18 +40,17 @@ extension View {
             .foregroundColor(.white)
             .padding()
             .frame(maxWidth: .infinity)
-            .background(AppTheme.accent)
+            .background(AppTheme.primary)
             .cornerRadius(15)
-            .shadow(color: AppTheme.accent.opacity(0.3), radius: 10, x: 0, y: 5)
     }
     
     func secondaryButtonStyle() -> some View {
         self
             .font(.headline)
-            .foregroundColor(AppTheme.accent)
+            .foregroundColor(AppTheme.primary)
             .padding()
             .frame(maxWidth: .infinity)
-            .background(AppTheme.accent.opacity(0.1))
+            .background(AppTheme.primary.opacity(0.1))
             .cornerRadius(15)
     }
 }
