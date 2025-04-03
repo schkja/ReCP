@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct RecipeFormView: View {
     @ObservedObject var viewModel: RecipeViewModel
@@ -14,8 +15,13 @@ struct RecipeFormView: View {
     @State private var cookTime: String = ""
     @State private var servings: String = ""
     @State private var imageURL: String = ""
+    @State private var isCustomImage: Bool = false
     
+    // Image picking state
+    @State private var selectedImage: UIImage?
+    @State private var showingImagePicker = false
     @State private var showingImageOptions = false
+    
     @FocusState private var focusedField: Field?
     
     enum Field: Hashable {
@@ -39,6 +45,12 @@ struct RecipeFormView: View {
             _cookTime = State(initialValue: recipe.cookTime)
             _servings = State(initialValue: String(recipe.servings))
             _imageURL = State(initialValue: recipe.imageURL)
+            _isCustomImage = State(initialValue: recipe.isCustomImage)
+            
+            // Load custom image if applicable
+            if recipe.isCustomImage {
+                _selectedImage = State(initialValue: UIImage.loadFromDocuments(fileName: recipe.imageURL))
+            }
         }
     }
     
@@ -51,7 +63,16 @@ struct RecipeFormView: View {
                     VStack(spacing: 24) {
                         // Recipe Image Preview
                         ZStack {
-                            if !imageURL.isEmpty {
+                            if let image = selectedImage {
+                                // Show selected image from photo library
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(height: 200)
+                                    .clipped()
+                                    .cornerRadius(12)
+                            } else if !imageURL.isEmpty && !isCustomImage {
+                                // Show image from asset catalog
                                 Image(imageURL)
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
@@ -59,6 +80,7 @@ struct RecipeFormView: View {
                                     .clipped()
                                     .cornerRadius(12)
                             } else {
+                                // Show placeholder
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(AppTheme.cardBackground)
                                     .frame(height: 200)
@@ -74,7 +96,28 @@ struct RecipeFormView: View {
                                         }
                                     )
                             }
+                            
+                            // Edit button overlay
+                            VStack {
+                                HStack {
+                                    Spacer()
+                                    
+                                    Button(action: {
+                                        showingImageOptions = true
+                                    }) {
+                                        Image(systemName: "pencil.circle.fill")
+                                            .font(.system(size: 30))
+                                            .foregroundColor(AppTheme.accent)
+                                            .background(Circle().fill(Color.white))
+                                            .shadow(radius: 2)
+                                    }
+                                    .padding(8)
+                                }
+                                
+                                Spacer()
+                            }
                         }
+                        .frame(height: 200)
                         .onTapGesture {
                             showingImageOptions = true
                         }
@@ -241,11 +284,6 @@ struct RecipeFormView: View {
                             }
                         }
                         
-                        // Image URL (hidden but still needed)
-                        TextField("Image URL", text: $imageURL)
-                            .opacity(0)
-                            .frame(height: 0)
-                        
                         // Save Button
                         Button(action: {
                             saveRecipe()
@@ -274,16 +312,38 @@ struct RecipeFormView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showingImagePicker) {
+                ImagePicker(image: $selectedImage)
+            }
             .actionSheet(isPresented: $showingImageOptions) {
                 ActionSheet(
                     title: Text("Select an image"),
-                    message: Text("Choose a sample image for your recipe"),
-                    buttons: sampleImages.map { imageName in
+                    message: Text("Choose a sample image or pick from your photos"),
+                    buttons: [
+                        .default(Text("Choose from Photos")) {
+                            showingImagePicker = true
+                        },
+                        .default(Text("Choose from Sample Images")) {
+                            // Show sample images
+                            imageURL = sampleImages.first ?? ""
+                            selectedImage = nil
+                            isCustomImage = false
+                        }
+                    ] + sampleImages.map { imageName in
                         .default(Text(imageName)) {
                             imageURL = imageName
+                            selectedImage = nil
+                            isCustomImage = false
                         }
                     } + [.cancel()]
                 )
+            }
+            .onChange(of: selectedImage) { _, newImage in
+                if let newImage = newImage {
+                    // Mark as custom image
+                    isCustomImage = true
+                    // We'll save the actual image when the recipe is saved
+                }
             }
         }
     }
@@ -295,12 +355,25 @@ struct RecipeFormView: View {
         !prepTime.isEmpty &&
         !cookTime.isEmpty &&
         !servings.isEmpty &&
-        !imageURL.isEmpty &&
+        ((!imageURL.isEmpty && !isCustomImage) || (selectedImage != nil && isCustomImage)) &&
         ingredients.allSatisfy { !$0.isEmpty } &&
         instructions.allSatisfy { !$0.isEmpty }
     }
     
     private func saveRecipe() {
+        // Handle image saving if a custom image is selected
+        var finalImageUrl = imageURL
+        var finalIsCustomImage = isCustomImage
+        
+        if let selectedImage = selectedImage {
+            // Save the selected image to the documents directory
+            if let savedImageName = selectedImage.saveToDocuments(with: "recipe") {
+                finalImageUrl = savedImageName
+                finalIsCustomImage = true
+            }
+        }
+        
+        // Create recipe with image information
         let recipe = Recipe(
             name: name,
             ingredients: ingredients.filter { !$0.isEmpty },
@@ -309,7 +382,8 @@ struct RecipeFormView: View {
             prepTime: prepTime,
             cookTime: cookTime,
             servings: Int(servings) ?? 1,
-            imageURL: imageURL
+            imageURL: finalImageUrl,
+            isCustomImage: finalIsCustomImage
         )
         
         if let editingRecipe = editingRecipe {
@@ -321,7 +395,7 @@ struct RecipeFormView: View {
         dismiss()
     }
     
-    // Sample image options (can be customized based on your app's images)
+    // Sample image options
     private var sampleImages: [String] {
         [
             "buddha_bowl",

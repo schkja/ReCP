@@ -10,9 +10,36 @@ struct Recipe: Identifiable, Equatable {
     let cookTime: String
     let servings: Int
     let imageURL: String
+    let isCustomImage: Bool
     
     static func == (lhs: Recipe, rhs: Recipe) -> Bool {
         lhs.id == rhs.id
+    }
+    
+    // For backward compatibility with existing code
+    init(name: String, ingredients: [String], instructions: [String], mood: Mood, prepTime: String, cookTime: String, servings: Int, imageURL: String) {
+        self.name = name
+        self.ingredients = ingredients
+        self.instructions = instructions
+        self.mood = mood
+        self.prepTime = prepTime
+        self.cookTime = cookTime
+        self.servings = servings
+        self.imageURL = imageURL
+        self.isCustomImage = false
+    }
+    
+    // New initializer with isCustomImage parameter
+    init(name: String, ingredients: [String], instructions: [String], mood: Mood, prepTime: String, cookTime: String, servings: Int, imageURL: String, isCustomImage: Bool) {
+        self.name = name
+        self.ingredients = ingredients
+        self.instructions = instructions
+        self.mood = mood
+        self.prepTime = prepTime
+        self.cookTime = cookTime
+        self.servings = servings
+        self.imageURL = imageURL
+        self.isCustomImage = isCustomImage
     }
 }
 
