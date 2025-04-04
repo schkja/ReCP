@@ -24,11 +24,9 @@ struct RecipeView: View {
                     GeometryReader { geo in
                         let scrollY = geo.frame(in: .global).minY
                         
-                        Image(recipe.imageURL)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: geo.size.width, height: 350 + (scrollY > 0 ? scrollY : 0))
-                            .clipped()
+                        // Updated to use RecipeImageView
+                        RecipeImageView(recipe: recipe, height: 350 + (scrollY > 0 ? scrollY : 0))
+                            .frame(width: geo.size.width)
                             .offset(y: scrollY > 0 ? -scrollY * 0.5 : 0)
                     }
                     .frame(height: 350)

@@ -64,6 +64,7 @@ struct ContentView: View {
 
 struct AppInfoView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     
     var body: some View {
         NavigationView {
@@ -113,6 +114,54 @@ struct AppInfoView: View {
                         InfoSection(title: "Adding Recipes", systemImage: "plus.circle.fill") {
                             Text("To add your own recipes, tap the list icon in the top right corner, then tap the + button.")
                                 .foregroundColor(AppTheme.primaryText)
+                        }
+                        
+                        // New developer section
+                        InfoSection(title: "About the Developer", systemImage: "person.fill") {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("App created by @skja")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(AppTheme.primaryText)
+                                
+                                // Developer links - made full width
+                                VStack(spacing: 12) {
+                                    Button(action: {
+                                        openURL(URL(string: "https://saschabelon.vercel.app/")!)
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "globe")
+                                            Text("Website")
+                                            Spacer()
+                                            Image(systemName: "arrow.up.right")
+                                                .font(.caption)
+                                        }
+                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 16)
+                                        .background(AppTheme.accent.opacity(0.15))
+                                        .foregroundColor(AppTheme.accent)
+                                        .cornerRadius(8)
+                                    }
+                                    
+                                    Button(action: {
+                                        openURL(URL(string: "https://github.com/schkja")!)
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "chevron.left.forwardslash.chevron.right")
+                                            Text("GitHub")
+                                            Spacer()
+                                            Image(systemName: "arrow.up.right")
+                                                .font(.caption)
+                                        }
+                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 16)
+                                        .background(AppTheme.accent.opacity(0.15))
+                                        .foregroundColor(AppTheme.accent)
+                                        .cornerRadius(8)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                            }
                         }
                     }
                     .padding(.horizontal)

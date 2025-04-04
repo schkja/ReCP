@@ -14,12 +14,8 @@ struct RecipeCardView: View {
                 .shadow(radius: 5)
             
             VStack(alignment: .leading, spacing: 0) {
-                // Recipe Image
-                Image(recipe.imageURL)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(height: 300)
-                    .clipped()
+                // Recipe Image - Updated to use RecipeImageView
+                RecipeImageView(recipe: recipe, height: 300)
                 
                 VStack(alignment: .leading, spacing: 12) {
                     // Recipe Name
@@ -79,4 +75,4 @@ struct RecipeCardView: View {
             color = .black
         }
     }
-} 
+}

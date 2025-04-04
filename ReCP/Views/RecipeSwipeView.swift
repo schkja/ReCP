@@ -104,12 +104,8 @@ struct RecipeCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Recipe Image
-            Image(recipe.imageURL)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 300)
-                .clipped()
+            // Recipe Image - Updated to use RecipeImageView
+            RecipeImageView(recipe: recipe, height: 300)
             
             VStack(alignment: .leading, spacing: 12) {
                 Text(recipe.name)

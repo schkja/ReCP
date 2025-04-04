@@ -5,29 +5,35 @@ struct RecipeImageView: View {
     let height: CGFloat
     
     var body: some View {
-        Group {
-            if recipe.isCustomImage {
-                if let uiImage = UIImage.loadFromDocuments(fileName: recipe.imageURL) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+        GeometryReader { geo in
+            Group {
+                if recipe.isCustomImage {
+                    if let uiImage = UIImage.loadFromDocuments(fileName: recipe.imageURL) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: geo.size.width, height: height)
+                            .clipped()
+                    } else {
+                        // Fallback if image can't be loaded
+                        Image(systemName: "photo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .padding()
+                            .foregroundColor(AppTheme.secondaryText)
+                            .background(AppTheme.cardBackground)
+                            .frame(width: geo.size.width, height: height)
+                    }
                 } else {
-                    // Fallback if image can't be loaded
-                    Image(systemName: "photo")
+                    // Standard image from asset catalog
+                    Image(recipe.imageURL)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding()
-                        .foregroundColor(AppTheme.secondaryText)
-                        .background(AppTheme.cardBackground)
+                        .scaledToFill()
+                        .frame(width: geo.size.width, height: height)
+                        .clipped()
                 }
-            } else {
-                // Standard image from asset catalog
-                Image(recipe.imageURL)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
             }
         }
         .frame(height: height)
-        .clipped()
     }
 }

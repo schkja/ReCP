@@ -140,11 +140,9 @@ struct EnhancedRecipeRow: View {
     
     var body: some View {
         HStack(spacing: 15) {
-            // Recipe image thumbnail
-            Image(recipe.imageURL)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 60, height: 60)
+            // Recipe image thumbnail - Updated to use RecipeImageView
+            RecipeImageView(recipe: recipe, height: 60)
+                .frame(width: 60)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .shadow(radius: 2)
             
