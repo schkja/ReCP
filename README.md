@@ -87,6 +87,6 @@
 
 ### 📦 Installation
 ```bash
-git clone https://github.com/your-username/ReCP.git
+git clone https://github.com/schkja/ReCP.git
 cd ReCP
 open ReCP.xcodeproj
